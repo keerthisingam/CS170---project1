@@ -38,7 +38,26 @@ def print_puzzle(puzzle):
         print(" ".join(map(str, row)))
     print()
 
-# Function to handle the main program flow
+    # Uniform Cost Search and basically u can add the hesuristic by making it equal to the function 
+def solve_puzzle(initial_state, goal_state, heuristic=0):
+    print("placeholder code for uniform search and other searches")
+
+# Calcluates the Misplaced Tiles heuristic
+def misplaced_tiles(state, goal_state):
+    return sum(
+        1 for i in range(3) for j in range(3) if state[i][j] != 0 and state[i][j] != goal_state[i][j]
+    )
+# Calcluates the Manhattan Distance heuristic
+def manhattan_distance(state, goal_state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] != 0:
+                value = state[i][j]
+                goal_i, goal_j = divmod(value - 1, 3)
+                distance += abs(i - goal_i) + abs(j - goal_j)
+    return distance
+
 def main():
     print("Welcome to the 8-Puzzle Solver!")
     puzzle_mode = input(
@@ -73,37 +92,28 @@ def main():
         "(3) A* with the Manhattan Distance Heuristic\n"
     )
 
+    goal_state = eight_goal_state  # Goal state is predefined
+
     if algorithm == "1":
         print("You selected Uniform Cost Search.")
-        # Call the Uniform Cost Search algorithm here
-        uniform_cost_search(puzzle)
+        solution = solve_puzzle(puzzle, goal_state, heuristic=0)
     elif algorithm == "2":
         print("You selected A* with the Misplaced Tile Heuristic.")
-        # Call the A* algorithm with the misplaced tile heuristic here
-        misplaced_tile(puzzle)  # Placeholder
+        solution = solve_puzzle(puzzle, goal_state, heuristic=misplaced_tiles)
     elif algorithm == "3":
         print("You selected A* with the Manhattan Distance Heuristic.")
-        # Call the A* algorithm with the Manhattan Distance heuristic here
-        manhattan_distance(puzzle)  # Placeholder
+        solution = solve_puzzle(puzzle, goal_state, heuristic=manhattan_distance)
     else:
         print("Invalid algorithm choice. Exiting program.")
         return
 
-# Placeholder function for Uniform Cost Search (to be implemented)
-def uniform_cost_search(puzzle):
-    print("Uniform Cost Search not implemented yet.")
-    # This is where the solving logic will go
+    # Output the solution
+    if solution:
+        print("\n YAYYY!! Solution found! Here are the steps to solve:")
+        for step in solution:
+            print_puzzle(step)
+    else:
+        print(" OH NO! No solution found :(")
 
-# Placeholder function for Uniform Cost Search (to be implemented)
-def misplaced_tile(puzzle):
-    print("A* not implemented yet.")
-    # This is where the solving logic will go
-
-    # Placeholder function for Uniform Cost Search (to be implemented)
-def manhattan_distance(puzzle):
-    print("A* not implemented yet.")
-    # This is where the solving logic will go
-
-# Run the main program
 if __name__ == "__main__":
     main()
