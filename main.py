@@ -1,4 +1,4 @@
-import heapq  # Used for the priority queue
+import heapq  # Used for the priority queue (min heap)
 
 # Predefined puzzles for testing
 trivial = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
@@ -38,24 +38,42 @@ def print_puzzle(puzzle):
         print(" ".join(map(str, row)))
     print()
 
-    # Uniform Cost Search and basically u can add the hesuristic by making it equal to the function 
+# Node class to represent a state in the search
+class Node:
+    def __init__(self, puzzle, parent=None, depth=0, h_cost=0):
+        self.puzzle = puzzle  # Current puzzle state (2D list)
+        self.parent = parent  # Reference to the parent node
+        self.depth = depth  # Depth (g(n)): Cost to reach this node
+        self.h_cost = h_cost  # Heuristic cost (h(n))
+        self.child1 = None  # First child (e.g., move up)
+        self.child2 = None  # Second child (e.g., move down)
+        self.child3 = None  # Third child (e.g., move left)
+        self.child4 = None  # Fourth child (e.g., move right)
+
+# Uniform Cost Search and basically u can add the hesuristic by making it equal to the function 
 def solve_puzzle(initial_state, goal_state, heuristic=0):
     print("placeholder code for uniform search and other searches")
 
 # Calcluates the Misplaced Tiles heuristic
 def misplaced_tiles(state, goal_state):
+    #changed from 3 to n so it works for any size puzzle
+    n = len(goal_state)
     return sum(
-        1 for i in range(3) for j in range(3) if state[i][j] != 0 and state[i][j] != goal_state[i][j]
+        1 for i in range(n) 
+            for j in range(n) 
+                if state[i][j] != 0 and state[i][j] != goal_state[i][j]
     )
 # Calcluates the Manhattan Distance heuristic
 def manhattan_distance(state, goal_state):
     distance = 0
-    for i in range(3):
-        for j in range(3):
+    #changed from 3 to n so it works for any size puzzle
+    n = len(goal_state)
+    for i in range(n):
+        for j in range(n):
             if state[i][j] != 0:
                 value = state[i][j]
-                goal_i, goal_j = divmod(value - 1, 3)
-                distance += abs(i - goal_i) + abs(j - goal_j)
+                goal_i, goal_j = divmod(value - 1, n)
+                distance += abs(i - goal_i) + abs(j - goal_j) #formula for manhattan distance
     return distance
 
 def main():
