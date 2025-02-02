@@ -33,13 +33,13 @@ def init_default_puzzle_mode():
         print("Invalid difficulty selected. Defaulting to 'Trivial'.")
         return trivial
 
-# Function to print the puzzle in a readable format
+#function to print the puzzle in a readable format
 def print_puzzle(puzzle):
     for row in puzzle:
         print(" ".join(map(str, row)))
     print()
 
-# Node class to represent a state in the search
+#node class to represent a state in the search
 class Node:
     def __init__(self, puzzle, parent=None, depth=0, h_cost=0):
         self.puzzle = puzzle  # Current puzzle state (2D list)
@@ -50,64 +50,60 @@ class Node:
         self.child2 = None  # Second child (e.g., move down)
         self.child3 = None  # Third child (e.g., move left)
         self.child4 = None  # Fourth child (e.g., move right)
+    def __lt__(self, other):
+        return (self.depth + self.h_cost) < (other.depth + other.h_cost)
 
-# finds all possible moves of the blank tile (0) and returns new puzzle states
+# finds all possible moves of the blank tile and returns new puzzle states
 def get_neighbors(state):
     neighbors = []
     blank_row, blank_col = None, None
-
-    # Find where '0' (blank tile) is in the puzzle
+    #fnds where the blank tile is
     for i in range(len(state)):
         for j in range(len(state[i])):
             if state[i][j] == 0:
                 blank_row, blank_col = i, j
-                break  # Stop searching once '0' is found
-    
+                break 
     # Move Up
     new_row, new_col = blank_row - 1, blank_col
-    if 0 <= new_row < len(state):  # Ensure move is within bounds
-        new_state = copy.deepcopy(state)  # Copy state
+    if 0 <= new_row < len(state): 
+        new_state = copy.deepcopy(state)  
         new_state[blank_row][blank_col], new_state[new_row][new_col] = (
             new_state[new_row][new_col],
             new_state[blank_row][blank_col],
-        )  # Swap tiles
-        neighbors.append(new_state)  # Add to possible states
-
+        ) 
+        neighbors.append(new_state)  
     # Move Down
     new_row, new_col = blank_row + 1, blank_col
-    if 0 <= new_row < len(state):  # Ensure move is within bounds
-        new_state = copy.deepcopy(state)  # Copy state
+    if 0 <= new_row < len(state):  
+        new_state = copy.deepcopy(state)  
         new_state[blank_row][blank_col], new_state[new_row][new_col] = (
             new_state[new_row][new_col],
             new_state[blank_row][blank_col],
         )
         neighbors.append(new_state)
-
     # Move Left
     new_row, new_col = blank_row, blank_col - 1
-    if 0 <= new_col < len(state[0]):  # Ensure move is within bounds
-        new_state = copy.deepcopy(state)  # Copy state
+    if 0 <= new_col < len(state[0]):  
+        new_state = copy.deepcopy(state)  
         new_state[blank_row][blank_col], new_state[new_row][new_col] = (
             new_state[new_row][new_col],
             new_state[blank_row][blank_col],
         )
         neighbors.append(new_state)
-
     # Move Right
     new_row, new_col = blank_row, blank_col + 1
-    if 0 <= new_col < len(state[0]):  # Ensure move is within bounds
-        new_state = copy.deepcopy(state)  # Copy state
+    if 0 <= new_col < len(state[0]):  
+        new_state = copy.deepcopy(state)  
         new_state[blank_row][blank_col], new_state[new_row][new_col] = (
             new_state[new_row][new_col],
             new_state[blank_row][blank_col],
         )
         neighbors.append(new_state)
+    return neighbors
 
-    return neighbors  # Return all valid moves
-
-# Generates and assigns children nodes
-def generate_children(node, goal_state, heuristic=None):
-    neighbors = get_neighbors(node.puzzle)  # Get valid neighbors
+#generates and assigns children nodes
+def generate_children(node, goal_state, heuristic=0):
+    neighbors = get_neighbors(node.puzzle)  #gets all the valid neighbors
     if len(neighbors) > 0:
         node.child1 = Node(
             puzzle=neighbors[0], parent=node, depth=node.depth + 1,
@@ -129,7 +125,7 @@ def generate_children(node, goal_state, heuristic=None):
             h_cost=(node.depth + 1 + (heuristic(neighbors[3], goal_state) if heuristic else 0))
         )
 
-# Backtrack the solution path
+#backtracks the solution path to help you see all the steps you took
 def trace_solution(node):
     path = []
     while node:
@@ -137,37 +133,35 @@ def trace_solution(node):
         node = node.parent
     return list(reversed(path))
 
-# Function to check if a node's puzzle state has been seen before
+#function to check if a node's puzzle state has been seen before
 def is_revisited(child):
-    # returns True if the child's puzzle state exists in its parent chain (prevents loops)
     parent = child.parent
     while parent:
-        if child.puzzle == parent.puzzle:  # If the state matches an ancestor, it's a loop
+        if child.puzzle == parent.puzzle:
             return True
-        parent = parent.parent  # Move up the chain
-    return False  # State is new, allow it
+        parent = parent.parent 
+    return False 
 
-# Solve function with Uniform Cost Search and A*
+#solves function with Uniform Cost Search and A*
 def solve_puzzle(initial_state, goal_state, heuristic=0):
     root = Node(puzzle=initial_state, h_cost=0)
-    priority_queue = []  # Priority queue to store nodes
-    heapq.heappush(priority_queue, (root.h_cost, root))  # Add root node
-
+    priority_queue = []  #priority queue to store nodes
+    heapq.heappush(priority_queue, (root.h_cost, root)) 
     while priority_queue:
-        _, current_node = heapq.heappop(priority_queue)  # Get node with the lowest cost
+        cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
 
-        if current_node.puzzle == goal_state:  # If goal state is reached, return solution
+        if current_node.puzzle == goal_state: 
             return trace_solution(current_node)
 
-        # Generate possible moves (children)
+        #generates all possible moves/children
         generate_children(current_node, goal_state, heuristic)
 
-        # Add only valid, unvisited children to the priority queue
+        # adds only valid and unvisited children to the priority queue
         for child in [current_node.child1, current_node.child2, current_node.child3, current_node.child4]:
-            if child and not is_revisited(child):  # Ignore already explored states
-                heapq.heappush(priority_queue, (child.h_cost, child))  # Add to queue
+            if child and not is_revisited(child):  #ignores already explored states
+                heapq.heappush(priority_queue, (child.h_cost, child))
 
-    return None  # No solution found
+    return None 
 
 # Calcluates the Misplaced Tiles heuristic
 def misplaced_tiles(state, goal_state):
