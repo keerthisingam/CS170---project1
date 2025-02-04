@@ -155,14 +155,14 @@ def solve_puzzle(initial_state, goal_state, heuristic=0):
     priority_queue = []  #priority queue to store nodes
     heapq.heappush(priority_queue, (root.h_cost, root)) 
 
-    max_queue_length = 0  # To track the max length of the priority queue
-    nodesExpanded = 0  # To count the number of nodes expanded
+    max_queue_length = 0  #tracks the max length of the priority queue
+    nodesExpanded = 0  #counts the number of nodes expanded
 
     while priority_queue:
-        cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
-
         if len(priority_queue) > max_queue_length:  #updates the max queue length
             max_queue_length = len(priority_queue)
+            
+        cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
 
         if current_node.puzzle == goal_state: 
             endTime = time.perf_counter()  # End timing
