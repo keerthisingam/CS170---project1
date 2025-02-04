@@ -154,15 +154,23 @@ def solve_puzzle(initial_state, goal_state, heuristic=0):
     root = Node(puzzle=initial_state, h_cost=0)
     priority_queue = []  #priority queue to store nodes
     heapq.heappush(priority_queue, (root.h_cost, root)) 
+
+    max_queue_length = 0  # To track the max length of the priority queue
+    nodesExpanded = 0  # To count the number of nodes expanded
+
     while priority_queue:
         cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
+
+        if len(priority_queue) > max_queue_length:  #updates the max queue length
+            max_queue_length = len(priority_queue)
 
         if current_node.puzzle == goal_state: 
             endTime = time.perf_counter()  # End timing
             elapsedTime = round(endTime - startTime, 3)    # Time taken
             depth = current_node.depth  # Solution depth
-            return trace_solution(current_node), depth, elapsedTime  # Return depth & time
-
+            return trace_solution(current_node), depth, elapsedTime, max_queue_length, nodesExpanded  # Return values
+        
+        nodesExpanded += 1  #increments the number of nodes expanded
         #generates all possible moves/children
         generate_children(current_node, goal_state, heuristic)
 
@@ -171,9 +179,9 @@ def solve_puzzle(initial_state, goal_state, heuristic=0):
             if child and not is_revisited(child):  #ignores already explored states
                 heapq.heappush(priority_queue, (child.h_cost, child))
 
-    return None 
+    return None,None,None,max_queue_length,nodesExpanded 
 
-# Calcluates the Misplaced Tiles heuristic
+#calcluates the Misplaced Tiles heuristic
 #used lecture slides
 def misplaced_tiles(state, goal_state):
     #changed from 3 to n so it works for any size puzzle
@@ -184,7 +192,7 @@ def misplaced_tiles(state, goal_state):
                 if state[i][j] != 0 and state[i][j] != goal_state[i][j]
     )
 
-# Calcluates the Manhattan Distance heuristic
+#calcluates the Manhattan Distance heuristic
 #used lecture slides and this article: https://www.educative.io/answers/how-to-solve-the-8-puzzle-problem-using-the-a-star-algorithm
 def manhattan_distance(state, goal_state):
     distance = 0
@@ -236,13 +244,13 @@ def main():
   
     if algorithm == "1":
         print("You selected Uniform Cost Search.")
-        solution, depth, elapsedTime = solve_puzzle(puzzle, goal_state, heuristic=0)
+        solution, depth, elapsedTime, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=0)
     elif algorithm == "2":
         print("You selected A* with the Misplaced Tile Heuristic.")
-        solution, depth, elapsedTime = solve_puzzle(puzzle, goal_state, heuristic=misplaced_tiles)
+        solution, depth, elapsedTime, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=misplaced_tiles)
     elif algorithm == "3":
         print("You selected A* with the Manhattan Distance Heuristic.")
-        solution, depth, elapsedTime = solve_puzzle(puzzle, goal_state, heuristic=manhattan_distance)
+        solution, depth, elapsedTime, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=manhattan_distance)
     else:
         print("Invalid algorithm choice. Exiting program.")
         return
@@ -257,6 +265,9 @@ def main():
             print_puzzle(step)
     else:
         print(" OH NO! No solution found :(")
+    #Print max queue length and number of nodes expanded
+    print(f"Max queue length: {max_queue_length}")
+    print(f"Nodes expanded: {nodes_expanded}")
 
 if __name__ == "__main__":
     main()
