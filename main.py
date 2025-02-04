@@ -161,12 +161,12 @@ def solve_puzzle(initial_state, goal_state, heuristic=0):
     while priority_queue:
         if len(priority_queue) > max_queue_length:  #updates the max queue length
             max_queue_length = len(priority_queue)
-            
+
         cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
 
         if current_node.puzzle == goal_state: 
             endTime = time.perf_counter()  # End timing
-            elapsedTime = round(endTime - startTime, 3)    # Time taken
+            elapsedTime = round(endTime - startTime, 4)    # Time taken
             depth = current_node.depth  # Solution depth
             return trace_solution(current_node), depth, elapsedTime, max_queue_length, nodesExpanded  # Return values
         
