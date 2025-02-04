@@ -4,10 +4,10 @@ import time
 
 # Predefined puzzles for testing
 trivial = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
-very_easy = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]
-easy = [[1, 2, 0], [4, 5, 3], [7, 8, 6]]
-doable = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
-oh_boy = [[8, 7, 1], [6, 0, 2], [5, 4, 3]]
+very_easy = [[1, 2, 3], [4, 5, 6], [0, 7, 8]]
+easy = [[1, 2, 3], [5, 0, 6], [4, 7, 8]]
+doable = [[1, 3, 6], [5, 0, 2], [4, 7, 8]]
+oh_boy = [[1, 3, 6], [5, 0, 7], [4, 8, 2]]
 eight_goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
 
 # Function to initialize the default puzzle
@@ -150,7 +150,7 @@ def is_revisited(child):
 #solves function with Uniform Cost Search and A*
 #used article, ta help and lecture slides: https://www.educative.io/answers/how-to-solve-the-8-puzzle-problem-using-the-a-star-algorithm
 def solve_puzzle(initial_state, goal_state, heuristic=0):
-    startTime=time.perf_counter() #starting the timer
+    # startTime=time.perf_counter() #starting the timer
     root = Node(puzzle=initial_state, h_cost=0)
     priority_queue = []  #priority queue to store nodes
     heapq.heappush(priority_queue, (root.h_cost, root)) 
@@ -165,10 +165,10 @@ def solve_puzzle(initial_state, goal_state, heuristic=0):
         cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
 
         if current_node.puzzle == goal_state: 
-            endTime = time.perf_counter()  # End timing
-            elapsedTime = round(endTime - startTime, 4)    # Time taken
+            # endTime = time.perf_counter()  # End timing
+            # elapsedTime = round(endTime - startTime, 3)    # Time taken
             depth = current_node.depth  # Solution depth
-            return trace_solution(current_node), depth, elapsedTime, max_queue_length, nodesExpanded  # Return values
+            return trace_solution(current_node), depth, max_queue_length, nodesExpanded  # Return values
         
         nodesExpanded += 1  #increments the number of nodes expanded
         #generates all possible moves/children
@@ -241,25 +241,26 @@ def main():
     )
 
     goal_state = eight_goal_state  # Goal state is predefined
-  
+    startTime=time.perf_counter() #starting the timer
     if algorithm == "1":
         print("You selected Uniform Cost Search.")
-        solution, depth, elapsedTime, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=0)
+        solution, depth, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=0)
     elif algorithm == "2":
         print("You selected A* with the Misplaced Tile Heuristic.")
-        solution, depth, elapsedTime, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=misplaced_tiles)
+        solution, depth, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=misplaced_tiles)
     elif algorithm == "3":
         print("You selected A* with the Manhattan Distance Heuristic.")
-        solution, depth, elapsedTime, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=manhattan_distance)
+        solution, depth, max_queue_length, nodes_expanded = solve_puzzle(puzzle, goal_state, heuristic=manhattan_distance)
     else:
         print("Invalid algorithm choice. Exiting program.")
         return
 
     # outputs the solution, depth, and time
     if solution:
+        endTime = time.perf_counter()
         print("\nYAYYY!! Solution found!")
         print("Depth:", depth)
-        print("Time taken:", elapsedTime, "seconds")
+        print("Time taken:", round(endTime - startTime, 4), "seconds")
         print("\nHere are the steps to solve:")
         for step in solution:
             print_puzzle(step)
