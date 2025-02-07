@@ -150,7 +150,6 @@ def is_revisited(child):
 #solves function with Uniform Cost Search and A*
 #used article, ta help and lecture slides: https://www.educative.io/answers/how-to-solve-the-8-puzzle-problem-using-the-a-star-algorithm
 def solve_puzzle(initial_state, goal_state, heuristic=0):
-    # startTime=time.perf_counter() #starting the timer
     root = Node(puzzle=initial_state, h_cost=0)
     priority_queue = []  #priority queue to store nodes
     heapq.heappush(priority_queue, (root.h_cost, root)) 
@@ -165,8 +164,6 @@ def solve_puzzle(initial_state, goal_state, heuristic=0):
         cost, current_node = heapq.heappop(priority_queue)  #gets node with the lowest cost
 
         if current_node.puzzle == goal_state: 
-            # endTime = time.perf_counter()  # End timing
-            # elapsedTime = round(endTime - startTime, 3)    # Time taken
             depth = current_node.depth  # Solution depth
             return trace_solution(current_node), depth, max_queue_length, nodesExpanded  # Return values
         
