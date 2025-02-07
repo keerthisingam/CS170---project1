@@ -35,6 +35,7 @@ def init_default_puzzle_mode():
         return trivial
 
 #function to print the puzzle in a readable format
+#used this article: https://dev.to/catundanatalia/map-and-join-and-strings-2p8 
 def print_puzzle(puzzle):
     for row in puzzle:
         print(" ".join(map(str, row)))
