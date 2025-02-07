@@ -135,7 +135,7 @@ def generate_children(node, goal_state, heuristic=0):
 def trace_solution(node):
     path = []
     while node:
-        path.append(node.puzzle)
+        path.append(node)
         node = node.parent
     return list(reversed(path))
 
@@ -261,7 +261,8 @@ def main():
         print("Time taken:", round(endTime - startTime, 4), "seconds")
         print("\nHere are the steps to solve:")
         for step in solution:
-            print_puzzle(step)
+            print(f"The best state to expand with g(n): {step.depth} and h(n): {step.h_cost} is...")
+            print_puzzle(step.puzzle)
     else:
         print(" OH NO! No solution found :(")
     #Print max queue length and number of nodes expanded
